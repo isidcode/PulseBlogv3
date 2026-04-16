@@ -11,19 +11,19 @@ const DashboardPage = () => {
 
     useEffect(() => {
         const fetchMyPosts = async () => {
-            if (!user?._id) return;
-            
-            try {
-                setLoading(true);
-                // Fetching posts for the specifically logged-in author
-                const res = await axiosInstance.get(`/posts/get-post-by-author/${user._id}`);
-                setPosts(res.data.data || []);
-            } catch (err) {
-                toast.error("Failed to fetch your posts");
-            } finally {
-                setLoading(false);
-            }
+        if (!user?._id) return;
+        try {
+            setLoading(true);
+            const res = await axiosInstance.get(`/posts/get-post-by-author/${user._id}`);
+            // FIX: was res.data.data — actual shape is res.data.data.data
+            setPosts(res.data.data?.data || []);
+        } catch (err) {
+            toast.error("Failed to fetch your posts");
+        } finally {
+            setLoading(false);
+        }
         };
+
 
         if (isLoggedIn) {
             fetchMyPosts();
