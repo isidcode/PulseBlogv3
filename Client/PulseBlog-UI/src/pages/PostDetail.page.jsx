@@ -117,7 +117,9 @@ const PostDetail = () => {
                         className="w-10 h-10 rounded-full object-cover"
                     />
                     <div>
-                        <p className="font-medium capitalize">{post.owner?.username}</p>
+                        <Link to={`/user/${post.owner?.username}`} className="font-medium capitalize hover:underline">
+                        {post.owner?.username}
+                        </Link>
                         <p className="text-sm text-dark-grey">
                             {new Date(post.createdAt).toLocaleDateString("en-US", {
                                 year: "numeric", month: "long", day: "numeric",
