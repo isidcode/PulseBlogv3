@@ -39,27 +39,25 @@ const WritePage = () => {
 
     // AI Functionality: Call the backend to polish the title
     const handlePolishTitle = async () => {
-        if (!title.trim()) {
-            return toast.error("Enter a basic title first to polish it!");
-        }
-        
-        setIsAiLoading(true);
-        try {
-            // Passing the current title as a query parameter to your AI route
-            const res = await axiosInstance.get(`/ai/polished-draft?text=${encodeURIComponent(title)}`);
-            
-            // Update the title input with the AI's response 
-            // Note: Adjust 'res.data.data.polishedText' if your backend JSON structure is slightly different
-            const aiPolishedTitle = res.data?.data?.polishedText || res.data?.data || res.data;
-            setTitle(aiPolishedTitle); 
-            
-            toast.success("Title polished by AI! ✨");
-        } catch (err) {
-            toast.error(err?.response?.data?.message || "AI service is currently unavailable");
-        } finally {
-            setIsAiLoading(false);
-        }
-    };
+  if (!title.trim()) return toast.error("Enter a title first!");
+
+  setIsAiLoading(true);
+  try {
+    const res = await axiosInstance.get(
+      `/ai/simplify?selectedText=${encodeURIComponent(title)}`
+    );
+    // simplify returns { simplified_explanation, analogy }
+    const result = res.data?.data?.simplified_explanation;
+    if (result) {
+      setTitle(result);
+      toast.success("Title polished by AI! ✨");
+    }
+  } catch (err) {
+    toast.error(err?.response?.data?.message || "AI unavailable");
+  } finally {
+    setIsAiLoading(false);
+  }
+};
 
     const handlePublish = async (isPublished) => {
         if (!title.trim()) return toast.error("Title is required");
