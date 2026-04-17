@@ -6,6 +6,7 @@ import HomePage from "./pages/Home.page";
 import WritePage from "./pages/Write.page";
 import PostDetail from "./pages/PostDetail.page";
 import DashboardPage from "./pages/Dashboard.page";
+import ProfilePage from "./pages/Profile.page";
 
 const App = () => {
     return (
@@ -19,6 +20,7 @@ const App = () => {
                     <Route path="write"        element={<WritePage />} />
                     <Route path="post/:postId" element={<PostDetail />} />
                     <Route path="dashboard"    element={<DashboardPage />} />
+                    <Route path="/user/:username" element={<ProfilePage />} />
                 </Route>
             </Routes>
         </>
