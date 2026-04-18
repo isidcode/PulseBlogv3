@@ -37,24 +37,29 @@ const WritePage = () => {
         setThumbnailPreview(URL.createObjectURL(file));
     };
 
-    // AI Functionality: Call the backend to polish the title
+   // AI Functionality: Call the backend to polish the title
     const handlePolishTitle = async () => {
-  if (!title.trim()) return toast.error("Enter a title first!");
+        if (!title.trim()) return toast.error("Enter a title first!");
 
-  setIsAiLoading(true);
-  try {
-    const res = await axiosInstance.post(`/ai/simplify`, { selectedText: title });
-    const result = res.data?.data?.simplified_explanation;
-    if (result) {
-      setTitle(result);
-      toast.success("Title polished by AI! ✨");
-    }
-  } catch (err) {
-    toast.error(err?.response?.data?.message || "AI unavailable");
-  } finally {
-    setIsAiLoading(false);
-  }
-};
+        setIsAiLoading(true);
+        try {
+            // FIXED: Changed to .get() and wrapped the payload in the 'data' property
+            // This forces Axios to send a body payload with a GET request.
+            const res = await axiosInstance.get(`/ai/simplify`, { 
+                data: { selectedText: title } 
+            });
+            
+            const result = res.data?.data?.simplified_explanation;
+            if (result) {
+                setTitle(result);
+                toast.success("Title polished by AI! ✨");
+            }
+        } catch (err) {
+            toast.error(err?.response?.data?.message || "AI unavailable");
+        } finally {
+            setIsAiLoading(false);
+        }
+    };
 
     const handlePublish = async (isPublished) => {
         if (!title.trim()) return toast.error("Title is required");
