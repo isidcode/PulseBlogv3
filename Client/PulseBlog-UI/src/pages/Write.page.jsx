@@ -21,7 +21,7 @@ const WritePage = () => {
 
     const fileRef = useRef(null);
 
-    if (isLoggedIn) {
+    if (!isLoggedIn) {
         return <Navigate to="/signin" replace />;
     }
 
