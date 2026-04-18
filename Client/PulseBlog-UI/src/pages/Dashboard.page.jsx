@@ -112,6 +112,14 @@ const DashboardPage = () => {
                                         >
                                             View
                                         </Link>
+
+                                        {/* ADDED: Edit Button */}
+                                        <Link 
+                                            to={`/edit/${post._id}`} 
+                                            className="text-sm font-medium hover:underline text-dark-grey"
+                                        >
+                                            Edit
+                                        </Link>
                                         
                                         <button 
                                             onClick={() => handleToggleStatus(post._id, post.isPublished)}
