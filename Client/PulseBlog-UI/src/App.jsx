@@ -20,14 +20,16 @@ const App = () => {
                     <Route index element={<HomePage />} />
                     <Route path="signin"       element={<UserAuthForm type="sign-in" />} />
                     <Route path="signup"       element={<UserAuthForm type="sign-up" />} />
+                    
+                    {/* Both routes render the same component */}
                     <Route path="write"        element={<WritePage />} />
+                    <Route path="edit/:postId" element={<WritePage />} />
+                    
                     <Route path="post/:postId" element={<PostDetail />} />
                     <Route path="dashboard"    element={<DashboardPage />} />
                     <Route path="/user/:username" element={<ProfilePage />} />
                     <Route path="search" element={<SearchPage />} />
                     <Route path="onboarding" element={<OnboardingPage />} />
-
-
                 </Route>
             </Routes>
         </>
