@@ -33,7 +33,7 @@ const UserAuthForm = ({ type }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 1. Basic Field Validation using Redux (No more toasts here!)
+        // 1. Basic Field Validation using Redux
         if (!formData.email || !formData.password) {
             return dispatch(loginFailure("Email and password are required."));
         }
@@ -41,21 +41,12 @@ const UserAuthForm = ({ type }) => {
             return dispatch(loginFailure("Username is required."));
         }
 
-        // 2. Strict Password Validation (ONLY for Sign-Up)
+        // 2. Strict Password Validation (ONLY for Sign-Up) using Regex
         if (type === "sign-up") {
-            const password = formData.password;
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
             
-            if (password.length < 8) {
-                return dispatch(loginFailure("Password must be at least 8 characters long."));
-            }
-            if (!/[A-Z]/.test(password)) {
-                return dispatch(loginFailure("Password must contain at least one uppercase letter."));
-            }
-            if (!/\d/.test(password)) {
-                return dispatch(loginFailure("Password must contain at least one number."));
-            }
-            if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-                return dispatch(loginFailure("Password must contain at least one special character."));
+            if (!passwordRegex.test(formData.password)) {
+                return dispatch(loginFailure("Password must be at least 8 characters long and include an uppercase letter, a number, and a special character."));
             }
         }
 
