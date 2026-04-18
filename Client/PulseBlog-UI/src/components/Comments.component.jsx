@@ -28,9 +28,9 @@ const Comments = ({ postId }) => {
     if (!newComment.trim()) return toast.error("Comment cannot be empty.");
 
     try {
-      // FIX: correct route prefix is /comment not /comments
       await axiosInstance.post(`/comment/comment/${postId}`, {
-        content: newComment  // Backend reads 'content'
+        // FIXED: Changed 'content' to 'commentText' to match backend middleware
+        commentText: newComment 
       });
       setNewComment("");
       toast.success("Comment added!");
@@ -39,7 +39,6 @@ const Comments = ({ postId }) => {
       toast.error(err?.response?.data?.message || "Failed to add comment");
     }
   };
-
   return (
     <div className="mt-12 pt-8 border-t border-grey">
       <h3 className="font-inter text-xl font-bold mb-6">
