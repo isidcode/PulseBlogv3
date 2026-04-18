@@ -106,7 +106,7 @@ const Navbar = () => {
                                         <p className="font-medium truncate">{user?.username}</p>
                                         <p className="text-sm text-dark-grey truncate">{user?.email}</p>
                                     </div>
-                                    <Link to={`/profile/${user?.username}`} className="block px-4 py-2 hover:bg-grey text-sm" onClick={() => setDropdownOpen(false)}>Profile</Link>
+                                    <Link to={`/user/${user?.username}`} className="block px-4 py-2 hover:bg-grey text-sm" onClick={() => setDropdownOpen(false)}>Profile</Link>
                                     <Link to="/dashboard" className="block px-4 py-2 hover:bg-grey text-sm" onClick={() => setDropdownOpen(false)}>Dashboard</Link>
                                     <Link to="/write" className="block px-4 py-2 hover:bg-grey text-sm" onClick={() => setDropdownOpen(false)}>Write a post</Link>
                                     <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-grey text-sm text-red-500">Sign Out</button>
