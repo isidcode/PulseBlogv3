@@ -1,11 +1,12 @@
-import { useRef, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import EditorComponent from "../components/Editor.component";
 import axiosInstance from "../api/axiosInstance";
 import toast, { Toaster } from "react-hot-toast";
 
 const WritePage = () => {
+    const { postId } = useParams(); // Determines if we are in Edit Mode
     const navigate = useNavigate();
     const { isLoggedIn } = useSelector((state) => state.auth);
 
@@ -16,10 +17,46 @@ const WritePage = () => {
     const [tags, setTags]                     = useState("");
     const [loading, setLoading]               = useState(false);
     
+    // State for initial data fetching (Edit Mode)
+    const [isFetching, setIsFetching]         = useState(true);
+
     // State for the AI Assistant
     const [isAiLoading, setIsAiLoading]       = useState(false);
 
     const fileRef = useRef(null);
+
+    // Fetch existing post data if in Edit Mode
+    useEffect(() => {
+        const fetchPost = async () => {
+            try {
+                const res = await axiosInstance.get(`/posts/get-post/${postId}`);
+                const post = res.data?.data || res.data;
+
+                setTitle(post.title || "");
+                setTags(Array.isArray(post.tags) ? post.tags.join(", ") : post.tags || "");
+                setThumbnailPreview(post.mediaImage || "");
+                
+                // Parse the content if stored as stringified JSON
+                const parsedContent = typeof post.content === 'string' 
+                    ? JSON.parse(post.content) 
+                    : post.content;
+                setContent(parsedContent);
+            } catch (err) {
+                toast.error(err?.response?.data?.message || "Failed to fetch post details");
+                navigate("/dashboard");
+            } finally {
+                setIsFetching(false);
+            }
+        };
+
+        if (isLoggedIn) {
+            if (postId) {
+                fetchPost();
+            } else {
+                setIsFetching(false); // Not in edit mode, stop loading instantly
+            }
+        }
+    }, [postId, isLoggedIn, navigate]);
 
     if (!isLoggedIn) {
         return <Navigate to="/signin" replace />;
@@ -37,14 +74,11 @@ const WritePage = () => {
         setThumbnailPreview(URL.createObjectURL(file));
     };
 
-   // AI Functionality: Call the backend to polish the title
     const handlePolishTitle = async () => {
         if (!title.trim()) return toast.error("Enter a title first!");
 
         setIsAiLoading(true);
         try {
-            // FIXED: Changed to .get() and wrapped the payload in the 'data' property
-            // This forces Axios to send a body payload with a GET request.
             const res = await axiosInstance.get(`/ai/simplify`, { 
                 data: { selectedText: title } 
             });
@@ -63,24 +97,40 @@ const WritePage = () => {
 
     const handlePublish = async (isPublished) => {
         if (!title.trim()) return toast.error("Title is required");
-        if (!thumbnail)    return toast.error("Thumbnail image is required");
         if (!content)      return toast.error("Write something first!");
+        
+        // Thumbnail is only strictly required if creating a NEW post
+        if (!postId && !thumbnail) return toast.error("Thumbnail image is required");
 
         setLoading(true);
         try {
             const form = new FormData();
             form.append("title", title);
             form.append("content", JSON.stringify(content)); 
-            form.append("mediaImage", thumbnail);            
+            
+            // Only append mediaImage if the user uploaded a new thumbnail
+            if (thumbnail) {
+                form.append("mediaImage", thumbnail);            
+            }
+            
             form.append("isPublished", isPublished);
             form.append("tags", tags);
 
-            await axiosInstance.post("/posts/create-post", form, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
+            if (postId) {
+                // EDIT MODE -> PATCH
+                await axiosInstance.patch(`/posts/update-post/${postId}`, form, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+                toast.success(isPublished ? "Post updated!" : "Draft updated!");
+            } else {
+                // CREATE MODE -> POST
+                await axiosInstance.post("/posts/create-post", form, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+                toast.success(isPublished ? "Post published!" : "Draft saved!");
+            }
 
-            toast.success(isPublished ? "Post published!" : "Draft saved!");
-            navigate("/");
+            navigate("/dashboard");
         } catch (err) {
             toast.error(err?.response?.data?.message || "Failed to save post");
         } finally {
@@ -88,12 +138,24 @@ const WritePage = () => {
         }
     };
 
+    // Prevent rendering the editor before old content is fetched, 
+    // otherwise the editor might start empty and overwrite the real content.
+    if (isFetching) {
+        return (
+            <div className="flex justify-center items-center h-[70vh]">
+                <p className="text-dark-grey text-xl animate-pulse">Loading editor...</p>
+            </div>
+        );
+    }
+
     return (
         <section>
             <Toaster />
             <div className="max-w-4xl mx-auto">
                 <div className="mb-8">
-                    <h1 className="text-2xl font-inter font-bold">New Post</h1>
+                    <h1 className="text-2xl font-inter font-bold">
+                        {postId ? "Edit Post" : "New Post"}
+                    </h1>
                 </div>
 
                 <div
@@ -150,7 +212,8 @@ const WritePage = () => {
                     className="input-box mb-6"
                 />
 
-                <EditorComponent onChange={setContent} />
+                {/* NOTE: Make sure EditorComponent accepts `initialContent` prop to pre-fill blocks */}
+                <EditorComponent initialContent={content} onChange={setContent} />
 
                 <div className="flex gap-3 justify-end mt-8">
                     <button
@@ -158,14 +221,14 @@ const WritePage = () => {
                         disabled={loading}
                         className="btn-light py-2 px-5 disabled:opacity-50"
                     >
-                        Save Draft
+                        {postId ? "Save as Draft" : "Save Draft"}
                     </button>
                     <button
                         onClick={() => handlePublish(true)}
                         disabled={loading}
                         className="btn-dark py-2 px-5 disabled:opacity-50"
                     >
-                        {loading ? "Publishing..." : "Publish"}
+                        {loading ? (postId ? "Updating..." : "Publishing...") : (postId ? "Publish Updates" : "Publish")}
                     </button>
                 </div>
             </div>
