@@ -43,10 +43,7 @@ const WritePage = () => {
 
   setIsAiLoading(true);
   try {
-    const res = await axiosInstance.get(
-      `/ai/simplify?selectedText=${encodeURIComponent(title)}`
-    );
-    // simplify returns { simplified_explanation, analogy }
+    const res = await axiosInstance.post(`/ai/simplify`, { selectedText: title });
     const result = res.data?.data?.simplified_explanation;
     if (result) {
       setTitle(result);
