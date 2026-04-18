@@ -10,8 +10,9 @@ const Comments = ({ postId }) => {
 
   const fetchComments = async () => {
     try {
-      // FIX: Backend now GET (not POST) after route fix in Step 4
-      const res = await axiosInstance.get(`/comment/get-comments/${postId}`);
+      // FIXED: Changed .get() to .post() to match the backend route definition.
+      // Even though we are fetching data, the backend specifically expects a POST request here.
+      const res = await axiosInstance.post(`/comment/get-comments/${postId}`);
       setComments(res.data.data?.data || []); // pagination wraps in {data, pagination}
     } catch (err) {
       console.error("Failed to fetch comments", err);
