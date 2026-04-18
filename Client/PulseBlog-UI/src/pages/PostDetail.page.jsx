@@ -59,10 +59,10 @@ const PostDetail = () => {
 
         try {
             if (isLiked) {
-                await axiosInstance.patch(`/likes/unlike-post/${postId}`);
+                await axiosInstance.patch(`/like/unlike-post/${postId}`);
                 setIsLiked(false);
             } else {
-                await axiosInstance.patch(`/likes/post-liked/${postId}`);
+                await axiosInstance.patch(`/like/post-liked/${postId}`);
                 setIsLiked(true);
             }
         } catch (err) {

@@ -7,6 +7,9 @@ import WritePage from "./pages/Write.page";
 import PostDetail from "./pages/PostDetail.page";
 import DashboardPage from "./pages/Dashboard.page";
 import ProfilePage from "./pages/Profile.page";
+import SearchPage from "./pages/Search.page";
+import OnboardingPage from "./pages/Onboarding.page";
+
 
 const App = () => {
     return (
@@ -21,6 +24,10 @@ const App = () => {
                     <Route path="post/:postId" element={<PostDetail />} />
                     <Route path="dashboard"    element={<DashboardPage />} />
                     <Route path="/user/:username" element={<ProfilePage />} />
+                    <Route path="search" element={<SearchPage />} />
+                    <Route path="onboarding" element={<OnboardingPage />} />
+
+
                 </Route>
             </Routes>
         </>
