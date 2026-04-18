@@ -36,7 +36,7 @@ const PostDetail = () => {
                 if (isLoggedIn) {
                     try {
                         const likeRes = await axiosInstance.get(`/like/post-like-status/${postId}`);
-                     setIsLiked(likeRes.data.data?.isLiked || false); 
+                     setIsLiked(likeRes.data.data === true);
                     } catch (err) {
                         console.error("Could not fetch like status", err);
                     }

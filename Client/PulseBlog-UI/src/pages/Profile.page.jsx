@@ -64,7 +64,7 @@ const ProfilePage = () => {
                     alt={profile.username}
                     className="w-32 h-32 rounded-full object-cover mb-4"
                 />
-                <h1 className="text-3xl font-bold font-gelasio capitalize">{profile.fullName || profile.username}</h1>
+                <h1 className="text-3xl font-bold font-gelasio capitalize">{profile.fullname || profile.username}</h1>
                 <p className="text-dark-grey text-lg mt-1">@{profile.username}</p>
                 
                 {profile.bio && (
